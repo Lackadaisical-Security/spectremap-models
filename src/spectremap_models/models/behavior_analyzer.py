@@ -79,10 +79,6 @@ class BehaviorAnalyzer(BaseModel):
             )(x)
             x = layers.BatchNormalization(name=f'bn_{i}')(x)
         
-        # Attention mechanism
-        attention = layers.Dense(1, activation='tanh', name='attention_score')(x)
-        attention_weights = layers.Activation('softmax', name='attention_weights')(attention)
-        
         # Dense layers
         x = layers.Dense(dense_units, activation='relu', name='dense')(x)
         x = layers.Dropout(dropout_rate, name='dropout')(x)

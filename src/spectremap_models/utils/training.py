@@ -105,7 +105,7 @@ def create_data_augmentation(
     Create a data augmentation pipeline for images.
     
     Args:
-        rotation_range: Degree range for random rotations
+        rotation_range: Degree range for random rotations (e.g., 20 for ±20 degrees)
         width_shift_range: Fraction of total width for horizontal shifts
         height_shift_range: Fraction of total height for vertical shifts
         horizontal_flip: Whether to randomly flip images horizontally
@@ -114,8 +114,11 @@ def create_data_augmentation(
     Returns:
         Sequential model for data augmentation
     """
+    # Convert rotation from degrees to fraction for Keras 3
+    rotation_fraction = rotation_range / 360.0
+    
     augmentation = keras.Sequential([
-        keras.layers.RandomRotation(rotation_range / 360.0),
+        keras.layers.RandomRotation(rotation_fraction),
         keras.layers.RandomTranslation(height_shift_range, width_shift_range),
         keras.layers.RandomZoom(zoom_range),
     ], name="data_augmentation")
