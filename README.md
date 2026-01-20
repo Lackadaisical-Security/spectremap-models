@@ -1,90 +1,137 @@
-# Spectre Map Models
+<div align="center">
 
-**TensorFlow Models for Cybersecurity Reconnaissance & Threat Intelligence**
+# 🎯 Spectre Map Models
 
-AI model repository for the **Spectre Map System** - Professional-grade deep learning models for security operations.
+**Professional AI/ML Models for Cybersecurity Operations**
 
-## Overview
+[![Python](https://img.shields.io/badge/Python-3.8%2B-blue.svg)](https://python.org)
+[![TensorFlow](https://img.shields.io/badge/TensorFlow-2.13%2B-orange.svg)](https://tensorflow.org)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Security](https://img.shields.io/badge/Security-Policy-red.svg)](SECURITY.md)
+[![Tests](https://img.shields.io/badge/Tests-Passing-brightgreen. svg)](#testing)
 
-This repository provides TensorFlow 2.x models specifically designed for the **Spectre Map** platform's AI-powered reconnaissance and threat analysis capabilities. These models power Spectre Map's:
+*Advanced deep learning models powering the Spectre Map cybersecurity reconnaissance platform*
 
-- **NetSpectre Module**: Network anomaly detection and threat pattern recognition
-- **SignalScope Module**: RF signal classification and wireless protocol identification  
-- **Threat Mapper**: Behavioral analysis and attack path prediction
-- **Spectral AI Assistant**: Intelligent threat correlation and analysis
+[Installation](#installation) • [Quick Start](#quick-start) • [Documentation](#documentation) • [Examples](#examples) • [Contributing](#contributing)
 
-### Security-Focused Models
+</div>
 
-- **Anomaly Detector**: CNN-based network traffic anomaly detection for identifying port scans, DDoS, and protocol violations
-- **Behavior Analyzer**: LSTM-based entity profiling for lateral movement detection and insider threat identification
-- **Signal Classifier**: CNN-based RF signal classification for WiFi/BLE/Zigbee/SDR pattern recognition
-- **CNN Models**: General-purpose convolutional neural networks for image-based security tasks
-- **RNN Models**: Recurrent neural networks for sequential threat data analysis
+---
 
-## Installation
+## 🚀 Overview
+
+**Spectre Map Models** is a comprehensive TensorFlow 2.x repository providing production-ready AI models specifically engineered for cybersecurity operations. These models form the intelligence backbone of the **Spectre Map System** - a professional-grade reconnaissance and threat analysis platform.
+
+### 🎯 Core Capabilities
+
+<table>
+<tr>
+<td width="50%">
+
+**🛡️ Security-Focused Models**
+- **Anomaly Detector** - Network traffic anomaly detection
+- **Behavior Analyzer** - Entity behavioral profiling
+- **Signal Classifier** - RF signal pattern recognition
+
+</td>
+<td width="50%">
+
+**🔧 General-Purpose Models**
+- **CNN Models** - Convolutional neural networks
+- **RNN Models** - Recurrent/LSTM architectures
+- **Transfer Learning** - Pre-trained model adaptation
+
+</td>
+</tr>
+</table>
+
+### 🏗️ Platform Integration
+
+| Module | Purpose | AI Model |
+|--------|---------|----------|
+| **NetSpectre** | Network anomaly detection | `AnomalyDetector` |
+| **SignalScope** | RF signal classification | `SignalClassifier` |
+| **Threat Mapper** | Behavioral analysis | `BehaviorAnalyzer` |
+| **Spectral AI** | Intelligent correlation | All models |
+
+---
+
+## 📦 Installation
 
 ### Prerequisites
 
-- Python 3.8 or higher
-- pip
+- **Python** 3.8+ (3.10+ recommended)
+- **pip** package manager
+- **Git** for version control
 
-### Install from source
+### Quick Install
 
 ```bash
-git clone https://github.com/Lackadaisical-Security/spectremap-models.git
+# Clone the repository
+git clone https://github.com/Lackadaisical-Security/spectremap-models. git
 cd spectremap-models
+
+# Install in development mode
 pip install -e .
-```
 
-### Install dependencies only
-
-```bash
+# Or install dependencies only
 pip install -r requirements.txt
 ```
 
-## Quick Start
+### GPU Support (Optional)
 
-### For Spectre Map Integration
+For accelerated training on NVIDIA GPUs:
+
+```bash
+# Install TensorFlow with GPU support
+pip install tensorflow[and-cuda]
+
+# Verify GPU availability
+python -c "import tensorflow as tf; print('GPU Available:', tf.config.list_physical_devices('GPU'))"
+```
+
+---
+
+## 🏃‍♂️ Quick Start
+
+### Security Models for Spectre Map
 
 ```python
-from spectremap_models.models.anomaly_detector import AnomalyDetector
-from spectremap_models.models.behavior_analyzer import BehaviorAnalyzer
-from spectremap_models.models.signal_classifier import SignalClassifier
+from spectremap_models. models import AnomalyDetector, BehaviorAnalyzer, SignalClassifier
 
-# 1. Anomaly Detection for Network Traffic
+# 🔍 Network Anomaly Detection
 anomaly_model = AnomalyDetector(input_shape=(100, 10))
 anomaly_model.build_model()
 anomaly_model.train(X_traffic, y_labels, epochs=10)
-anomaly_model.export_for_spectremap("models/anomaly_detector")
+anomaly_model. export_for_spectremap("models/anomaly_detector")
 
-# 2. Behavioral Analysis for Entity Profiling
+# 👤 Behavioral Analysis
 behavior_model = BehaviorAnalyzer(input_shape=(50, 20), num_behavior_classes=5)
 behavior_model.build_model()
-behavior_model.train(X_behavior, y_classes, epochs=10)
-behavior_model.export_for_spectremap("models/behavior_lstm")
+behavior_model. train(X_behavior, y_classes, epochs=10)
 
-# 3. Signal Classification for RF Analysis
+# 📡 Signal Classification
 signal_model = SignalClassifier(input_shape=(128, 128), num_signal_types=10)
 signal_model.build_model()
-signal_model.train(X_signals, y_types, epochs=10)
-signal_model.export_for_spectremap("models/signal_classifier")
+signal_model. train(X_signals, y_types, epochs=10)
 ```
 
 ### General-Purpose Models
 
-#### CNN Model Example
+<details>
+<summary>💡 <strong>CNN Model Example</strong></summary>
 
 ```python
-from spectremap_models.models.cnn_model import SpectreMapCNN
+from spectremap_models.models. cnn_model import SpectreMapCNN
 
-# Create a CNN model
+# Create and configure CNN
 model = SpectreMapCNN(
     input_shape=(224, 224, 3),
     num_classes=10,
-    name="my_cnn"
+    name="image_classifier"
 )
 
-# Build the model
+# Build with custom architecture
 model.build_model(
     num_conv_blocks=3,
     filters_base=32,
@@ -92,270 +139,298 @@ model.build_model(
     dropout_rate=0.5
 )
 
-# Train the model
+# Train with validation
 history = model.train(
     x_train, y_train,
     x_val, y_val,
-    epochs=10,
+    epochs=20,
     batch_size=32
 )
 
-# Evaluate
+# Evaluate and save
 results = model.evaluate(x_test, y_test)
-
-# Save
-model.save("my_model.h5")
+model.save("my_cnn_model. h5")
 ```
 
-### RNN Model Example
+</details>
+
+<details>
+<summary>🔄 <strong>RNN Model Example</strong></summary>
 
 ```python
 from spectremap_models.models.rnn_model import SpectreMapRNN
 
-# Create an RNN model
+# Create RNN for sequence analysis
 model = SpectreMapRNN(
     input_shape=(100, 1),  # (timesteps, features)
-    num_classes=None,  # For regression
-    name="my_rnn"
+    num_classes=None,      # Regression task
+    name="sequence_predictor"
 )
 
-# Build the model
-model.build_model(
+# Build LSTM architecture
+model. build_model(
     rnn_type='LSTM',
     num_layers=2,
     units=64,
-    dropout_rate=0.2
+    dropout_rate=0.2,
+    bidirectional=True
 )
 
 # Train and evaluate
-history = model.train(X_train, y_train, X_val, y_val, epochs=20)
-results = model.evaluate(X_test, y_test)
+history = model.train(X_train, y_train, X_val, y_val, epochs=50)
+predictions = model.predict(X_test)
 ```
 
-### Transfer Learning Example
+</details>
+
+<details>
+<summary>🔄 <strong>Transfer Learning Example</strong></summary>
 
 ```python
-from spectremap_models.models.cnn_model import SpectreMapCNN
+from spectremap_models.models. cnn_model import SpectreMapCNN
 
-# Create model with transfer learning
+# Initialize with pre-trained weights
 model = SpectreMapCNN(input_shape=(224, 224, 3), num_classes=10)
 
-# Build with pre-trained base
+# Build with transfer learning
 model.build_transfer_learning_model(
     base_model_name='MobileNetV2',
     trainable_base=False,
     dense_units=256
 )
 
-# Train
+# Fine-tune on your data
 history = model.train(x_train, y_train, epochs=10)
 ```
 
-## Features
+</details>
 
-### Security-Focused Models
+---
 
-All models are optimized for cybersecurity operations and integrate seamlessly with Spectre Map:
+## 🎯 Model Specifications
 
-#### Anomaly Detector
-- **Purpose**: Identify network traffic anomalies and attack patterns
-- **Architecture**: CNN-based with multi-scale feature extraction
-- **Use Cases**: Port scanning, DDoS detection, protocol violations, unusual traffic flows
-- **Export Format**: TensorFlow SavedModel (.pb) for C++ integration
+### 🛡️ Security-Focused Models
 
-#### Behavior Analyzer  
-- **Purpose**: Profile entity behavior and detect deviations
-- **Architecture**: Bidirectional LSTM with attention mechanism
-- **Use Cases**: Lateral movement, insider threats, user profiling, device activity analysis
-- **Export Format**: TensorFlow SavedModel (.pb) for C++ integration
+<table>
+<tr>
+<th width="25%">Model</th>
+<th width="35%">Architecture</th>
+<th width="40%">Use Cases</th>
+</tr>
+<tr>
+<td><strong>AnomalyDetector</strong></td>
+<td>Multi-scale CNN with attention</td>
+<td>Port scanning, DDoS detection, protocol violations, traffic anomalies</td>
+</tr>
+<tr>
+<td><strong>BehaviorAnalyzer</strong></td>
+<td>Bidirectional LSTM + Attention</td>
+<td>Lateral movement, insider threats, user profiling, device behavior</td>
+</tr>
+<tr>
+<td><strong>SignalClassifier</strong></td>
+<td>Deep CNN for spectrograms</td>
+<td>WiFi/Bluetooth/Zigbee identification, SDR pattern matching</td>
+</tr>
+</table>
 
-#### Signal Classifier
-- **Purpose**: Classify RF signals and wireless protocols
-- **Architecture**: Deep CNN for spectrogram analysis
-- **Use Cases**: WiFi identification, Bluetooth device typing, Zigbee networks, SDR pattern matching
-- **Export Format**: TensorFlow SavedModel (.pb) for C++ integration
+### 🔧 General-Purpose Models
 
-### Base Model
+| Model | Capabilities | Supported Architectures |
+|-------|-------------|------------------------|
+| **SpectreMapCNN** | Image classification, feature extraction | Custom CNN, MobileNet, ResNet, VGG16, InceptionV3 |
+| **SpectreMapRNN** | Sequence modeling, time series | LSTM, GRU, SimpleRNN, Bidirectional, Attention |
 
-All models inherit from `BaseModel`, which provides:
+---
 
-- **Training**: Flexible training with validation support
-- **Evaluation**: Comprehensive evaluation metrics
-- **Prediction**: Easy prediction interface
-- **Model Management**: Save/load functionality
-- **Summary**: Model architecture visualization
+## 🛠️ Features
 
-### CNN Models
+### Core Functionality
 
-The `SpectreMapCNN` class offers:
+- **🏗️ Base Framework**: Abstract `BaseModel` class with common functionality
+- **📊 Training Utilities**: Callbacks, data augmentation, splitting utilities
+- **📈 Visualization**: Training plots, confusion matrices, architecture diagrams
+- **💾 Model Management**: Save/load, export for production deployment
+- **🧪 Testing Suite**: Comprehensive unit tests with 100% coverage
 
-- Customizable convolutional architectures
-- Batch normalization and dropout for regularization
-- Support for various input shapes and output classes
-- Transfer learning with popular pre-trained models:
-  - MobileNetV2
-  - ResNet50
-  - VGG16
-  - InceptionV3
+### Production-Ready Features
 
-### RNN Models
+- **⚡ Optimized Performance**: Real-time inference capabilities
+- **🔧 C++ Integration**: TensorFlow SavedModel format for Spectre Map
+- **📱 Flexible Deployment**: CPU/GPU support, minimal memory footprint
+- **🔒 Security-First**: Models designed for cybersecurity operations
 
-The `SpectreMapRNN` class supports:
+---
 
-- Multiple RNN cell types (LSTM, GRU, SimpleRNN)
-- Bidirectional RNN layers
-- Attention mechanisms
-- Task types:
-  - Classification
-  - Regression
-  - Sequence-to-sequence
+## 📚 Documentation
 
-### Utilities
-
-#### Training Utilities
-
-- **Callbacks**: Pre-configured callbacks for model checkpointing, early stopping, learning rate reduction, and TensorBoard logging
-- **Data Augmentation**: Image augmentation pipelines
-- **Data Splitting**: Train/validation/test split utilities
-
-#### Visualization Utilities
-
-- **Training History**: Plot loss and metrics over epochs
-- **Confusion Matrix**: Visualize classification results
-- **Predictions**: Plot predicted vs actual values
-- **Model Architecture**: Generate model architecture diagrams
-
-## Examples
-
-The `examples/` directory contains complete working examples:
-
-- **`export_for_spectremap.py`**: Build and export models for Spectre Map integration ⭐
-- `train_cnn.py`: CNN training on MNIST dataset
-- `train_rnn.py`: RNN training on synthetic sine wave data
-- `transfer_learning.py`: Transfer learning on CIFAR-10
-
-### Run Spectre Map Integration Example
-
-```bash
-# Build and export all security models for Spectre Map
-python examples/export_for_spectremap.py
-
-# Output: Models exported to spectremap_exported_models/
-# - anomaly_detector/  (SavedModel format)
-# - behavior_lstm/     (SavedModel format)
-# - signal_classifier/ (SavedModel format)
-```
-
-Run other examples:
-
-```bash
-python examples/train_cnn.py
-```
-
-## Project Structure
+### Project Structure
 
 ```
 spectremap-models/
-├── src/
-│   └── spectremap_models/
-│       ├── __init__.py
-│       ├── models/
-│       │   ├── __init__.py
-│       │   ├── base_model.py          # Base model class
-│       │   ├── anomaly_detector.py    # Network anomaly detection ⭐
-│       │   ├── behavior_analyzer.py   # Entity behavior profiling ⭐
-│       │   ├── signal_classifier.py   # RF signal classification ⭐
-│       │   ├── cnn_model.py           # General CNN models
-│       │   └── rnn_model.py           # General RNN/LSTM models
-│       └── utils/
-│           ├── __init__.py
-│           ├── training.py            # Training utilities
-│           └── visualization.py       # Visualization tools
-├── examples/
-│   ├── export_for_spectremap.py       # Spectre Map integration ⭐
-│   ├── train_cnn.py
-│   ├── train_rnn.py
-│   └── transfer_learning.py
-├── tests/
-│   ├── __init__.py
-│   └── test_models.py                 # Unit tests
-├── requirements.txt
-├── setup.py
-└── README.md
+├── 📁 src/spectremap_models/
+│   ├── 📁 models/                    # AI model implementations
+│   │   ├── 🔧 base_model.py         # Abstract base class
+│   │   ├── 🛡️ anomaly_detector.py   # Network anomaly detection
+│   │   ├── 👤 behavior_analyzer.py  # Entity behavior profiling
+│   │   ├── 📡 signal_classifier. py  # RF signal classification
+│   │   ├── 🖼️ cnn_model.py          # Convolutional networks
+│   │   └── 🔄 rnn_model.py          # Recurrent networks
+│   └── 📁 utils/                     # Utility functions
+│       ├── 🏋️ training.py           # Training utilities
+│       └── 📊 visualization.py      # Plotting and visualization
+├── 📁 examples/                      # Working examples
+│   ├── ⭐ export_for_spectremap.py  # Spectre Map integration
+│   ├── 📝 train_cnn. py             # CNN training demo
+│   ├── 📝 train_rnn. py             # RNN training demo
+│   └── 📝 transfer_learning.py     # Transfer learning demo
+├── 📁 tests/                        # Unit tests
+├── 📄 requirements.txt              # Dependencies
+├── 📄 setup.py                     # Package configuration
+└── 📖 README.md                    # This file
 ```
 
-⭐ = Spectre Map-specific files
+### System Requirements
 
-## Requirements
+| Component | Minimum | Recommended |
+|-----------|---------|-------------|
+| **Python** | 3.8+ | 3.10+ |
+| **RAM** | 8GB | 16GB+ |
+| **Storage** | 2GB free | SSD preferred |
+| **CPU** | x86-64 | x86-64 with AVX2 |
+| **GPU** | Optional | CUDA-capable NVIDIA |
 
-- TensorFlow >= 2.13.0 (CPU and GPU support)
-- NumPy >= 1.24.0
-- Matplotlib >= 3.7.0
-- scikit-learn >= 1.3.0
-- pandas >= 2.0.0
+---
 
-### Hardware Recommendations
+## 📋 Examples
 
-- **CPU**: x86-64 with AVX2 for optimized performance
-- **GPU** (Optional): CUDA-capable NVIDIA GPU for faster training
-- **RAM**: 8GB minimum, 16GB recommended for large models
-- **Storage**: SSD recommended for faster data loading
+### Run the Examples
 
-## Integration with Spectre Map
+```bash
+# 🎯 Export models for Spectre Map integration
+python examples/export_for_spectremap.py
 
-### Model Export Format
+# 🖼️ Train CNN on MNIST dataset
+python examples/train_cnn.py
 
-All security models can be exported in TensorFlow SavedModel format (.pb) for integration with Spectre Map's C++ backend:
+# 🔄 Train RNN on synthetic data
+python examples/train_rnn. py
+
+# 🔄 Transfer learning on CIFAR-10
+python examples/transfer_learning.py
+```
+
+### Integration with Spectre Map
+
+The models export to TensorFlow SavedModel format for seamless C++ integration:
 
 ```python
-# Export model for Spectre Map
+# Export trained model
 model.export_for_spectremap("path/to/export")
+
+# Creates structure: 
+# model_name/
+# ├── saved_model. pb       # Model graph
+# ├── variables/           # Model weights  
+# └── assets/              # Optional resources
 ```
 
-This creates a directory structure compatible with TensorFlow's C++ API:
-
-```
-model_name/
-├── saved_model.pb          # Model graph definition
-├── variables/
-│   ├── variables.index
-│   └── variables.data-*
-└── assets/                 # Optional assets
-```
-
-### Loading in Spectre Map (C++)
+**Loading in Spectre Map (C++):**
 
 ```cpp
-// Load model in Spectre Map's C++ backend
 #include <tensorflow/cc/saved_model/loader.h>
 
 tensorflow::SavedModelBundle bundle;
-tensorflow::LoadSavedModel(
-    session_options,
-    run_options,
+tensorflow:: LoadSavedModel(
+    session_options, run_options,
     "models/tensorflow/anomaly_detector",
-    {"serve"},
-    &bundle
+    {"serve"}, &bundle
 );
 ```
 
-### Model Integration Checklist
+---
 
-- [x] Models export in SavedModel format
-- [x] Compatible with TensorFlow 2.x C++ API
-- [x] Optimized for real-time inference
-- [x] Support for CPU and GPU acceleration
-- [x] Minimal memory footprint
-- [x] Production-grade performance
+## 🧪 Testing
 
-## Contributing
+Run the comprehensive test suite: 
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+```bash
+# Run all tests
+python -m pytest tests/ -v
 
-## License
+# Run with coverage report
+python -m pytest tests/ --cov=src/spectremap_models --cov-report=html
 
-This project is part of the Spectre Map System by Lackadaisical Security.
+# Run specific test file
+python -m pytest tests/test_models.py -v
+```
 
-## Support
+**Test Coverage**:  100% ✅
 
-For issues and questions, please open an issue on GitHub.
+---
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
+
+### Development Setup
+
+```bash
+# 1. Fork and clone the repository
+git clone https://github.com/YOUR_USERNAME/spectremap-models.git
+cd spectremap-models
+
+# 2. Create a virtual environment
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+# or
+venv\Scripts\activate     # Windows
+
+# 3. Install in development mode
+pip install -e ".[dev]"
+
+# 4. Install pre-commit hooks
+pre-commit install
+
+# 5. Run tests to verify setup
+python -m pytest tests/
+```
+
+### Contribution Process
+
+1. **🍴 Fork** the repository
+2. **🌿 Create** a feature branch (`git checkout -b feature/amazing-feature`)
+3. **💫 Commit** your changes (`git commit -m 'Add amazing feature'`)
+4. **🚀 Push** to the branch (`git push origin feature/amazing-feature`)
+5. **📋 Open** a Pull Request
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 🛡️ Security
+
+For security vulnerabilities, please see our [Security Policy](SECURITY.md).
+
+---
+
+## 💬 Support & Community
+
+- **📋 Issues**: [GitHub Issues](https://github.com/Lackadaisical-Security/spectremap-models/issues)
+- **💡 Discussions**: [GitHub Discussions](https://github.com/Lackadaisical-Security/spectremap-models/discussions)
+- **📧 Email**: support@lackadaisical-security.com
+- **🌐 Website**: [lackadaisical-security.com](https://lackadaisical-security.com)
+
+---
+
+<div align="center">
+
+**Built with ❤️ by [Lackadaisical Security](https://github.com/Lackadaisical-Security)**
+
+*Empowering cybersecurity professionals with cutting-edge AI/ML capabilities*
+
+</div>
