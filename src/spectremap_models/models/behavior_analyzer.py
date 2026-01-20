@@ -117,5 +117,6 @@ class BehaviorAnalyzer(BaseModel):
         if self.model is None:
             raise ValueError("Model not built. Call build_model() first.")
         
-        self.model.save(export_path, save_format='tf')
+        # Export using Keras save (creates SavedModel format by default)
+        self.model.save(export_path)
         print(f"Model exported for Spectre Map at: {export_path}")
