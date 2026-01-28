@@ -1,439 +1,652 @@
 # Contributing to Spectre Map Models
 
-Thank you for your interest in contributing to **Spectre Map Models**! This document provides guidelines and information for contributors.
+So you want to contribute AI/ML models for cybersecurity? Good. We need people who can train neural networks, not people who can talk about training neural networks.
 
-## 📋 Table of Contents
+## Table of Contents
 
 - [Code of Conduct](#code-of-conduct)
 - [Getting Started](#getting-started)
-- [Development Setup](#development-setup)
-- [Contribution Guidelines](#contribution-guidelines)
+- [Development Process](#development-process)
+- [Model Development Guidelines](#model-development-guidelines)
 - [Pull Request Process](#pull-request-process)
-- [Issue Guidelines](#issue-guidelines)
 - [Coding Standards](#coding-standards)
 - [Testing Guidelines](#testing-guidelines)
 - [Documentation](#documentation)
-- [Release Process](#release-process)
+- [Security & Ethics](#security--ethics)
+- [License](#license)
 
-## 📜 Code of Conduct
+## Code of Conduct
 
-By participating in this project, you agree to abide by our [Code of Conduct](CODE_OF_CONDUCT.md). Please read it before contributing.
+Read [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md). TL;DR: Be competent, be honest, respect data privacy, don't export to sanctioned countries. Your model performance speaks louder than anything else.
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
-- **Python 3.8+** (3.10+ recommended)
-- **Git** for version control
-- **GitHub account** for contributions
-- Basic understanding of **TensorFlow** and **machine learning**
+Before you waste anyone's time, make sure you have:
 
-### First-Time Setup
+* **Python 3.8+** (3.10+ recommended)
+* **TensorFlow 2.13+** or **PyTorch 2.0+** (depending on what you're building)
+* **GPU** (optional but highly recommended - training on CPU is pain)
+* **Understanding of ML fundamentals** (if you don't know what overfitting is, learn first)
+* **Git** (obviously)
+* **Brain** (not optional)
 
-1. **Fork** the repository on GitHub
-2. **Clone** your fork locally: 
-   ```bash
-   git clone https://github.com/YOUR_USERNAME/spectremap-models.git
-   cd spectremap-models
-   ```
-3. **Add upstream** remote:
-   ```bash
-   git remote add upstream https://github.com/Lackadaisical-Security/spectremap-models.git
-   ```
+### Setting Up Development Environment
 
-## 🛠️ Development Setup
-
-### Environment Setup
-
+#### 1. Fork the Repository
 ```bash
-# Create virtual environment
+# Fork via GitHub UI, then clone your fork
+git clone https://github.com/YOUR_USERNAME/spectremap-models.git
+cd spectremap-models
+```
+
+#### 2. Add Upstream Remote
+```bash
+git remote add upstream https://github.com/Lackadaisical-Security/spectremap-models.git
+```
+
+#### 3. Create Virtual Environment
+```bash
+# Create venv
 python -m venv venv
+
+# Activate
 source venv/bin/activate  # Linux/Mac
 # or
 venv\Scripts\activate     # Windows
+```
 
-# Install development dependencies
+#### 4. Install Dependencies
+```bash
+# Install in development mode
 pip install -e ".[dev]"
+
+# Or just dependencies
+pip install -r requirements.txt
 
 # Install pre-commit hooks
 pre-commit install
 ```
 
-### Development Dependencies
-
-The development setup includes:
-
-- **pytest**: Testing framework
-- **pytest-cov**: Coverage reporting
-- **black**: Code formatting
-- **flake8**:  Linting
-- **mypy**: Type checking
-- **pre-commit**: Git hooks
-- **sphinx**: Documentation generation
-
-### Verify Setup
-
+#### 5. Verify Installation
 ```bash
-# Run tests to verify everything works
+# Run tests
 python -m pytest tests/ -v
 
-# Check code formatting
-black --check src/ tests/
+# Check GPU availability
+python -c "import tensorflow as tf; print('GPU:', tf.config.list_physical_devices('GPU'))"
+```
 
-# Run linting
+If tests fail, fix your environment before opening an issue.
+
+## Development Process
+
+### Branching Strategy
+
+* `main` - Stable production releases (don't touch unless you're a maintainer)
+* `develop` - Integration branch for models
+* `model/your-model-name` - Your model development branch
+* `bugfix/bug-description` - Bug fix branches
+* `data/dataset-name` - New training data branches
+
+### Workflow
+
+#### 1. Create a Model Branch
+```bash
+git checkout -b model/sick-new-detector develop
+```
+
+#### 2. Develop Your Model
+* Design architecture (document your choices)
+* Prepare training data (ethical sourcing, proper licensing)
+* Train model (reproducible, with seeds)
+* Evaluate performance (multiple metrics, not just accuracy)
+* Optimize inference (production deployment matters)
+* Document everything (see [Documentation](#documentation))
+
+#### 3. Commit Changes
+```bash
+git add .
+git commit -m "feat(model): add sick new detector for XYZ threats"
+```
+
+#### 4. Keep Your Branch Updated
+```bash
+git fetch upstream
+git rebase upstream/develop
+```
+
+#### 5. Push Changes
+```bash
+git push origin model/sick-new-detector
+```
+
+#### 6. Create Pull Request
+* Open PR against `develop` branch
+* Fill out the template completely (include metrics, plots, ablation studies)
+* Link related issues
+* Wait for review (maintainers will check performance, not just code)
+
+### Commit Message Guidelines
+
+Follow [Conventional Commits](https://www.conventionalcommits.org/):
+
+```
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
+```
+
+**Types:**
+* `feat` - New model or feature
+* `fix` - Bug fix in training/inference code
+* `docs` - Documentation only
+* `style` - Code formatting (black, flake8)
+* `refactor` - Code refactoring
+* `perf` - Performance improvements (faster training/inference)
+* `test` - Tests
+* `data` - Training data changes
+* `chore` - Build/tooling changes
+
+**Examples:**
+```
+feat(model): add LSTM-based behavior analyzer
+
+Implemented bidirectional LSTM with attention mechanism
+for entity behavior profiling. Achieves 94.2% accuracy on
+synthetic behavioral dataset.
+
+- Architecture: 2-layer BiLSTM + Attention
+- Training time: 45 min on V100
+- Inference: 12ms per sample
+- Model size: 0.7 MB
+
+Closes #42
+```
+
+```
+perf(training): optimize data loading pipeline
+
+Replaced eager data loading with tf.data.Dataset pipeline.
+Reduces training time by 3.5x on ImageNet subset.
+
+Before: 2.4 hours/epoch
+After: 41 minutes/epoch
+
+Benchmark results in docs/benchmarks/data_loading.md
+```
+
+```
+data(anomaly): add synthetic network traffic dataset
+
+Generated 1M synthetic network flows for anomaly detection.
+Includes benign traffic + 7 attack types (port scan, DDoS, etc.)
+
+- Source: Synthetic (no PII, no privacy concerns)
+- License: MIT (safe for open source)
+- Format: CSV with pcap metadata
+- Size: 2.3 GB compressed
+
+See data/synthetic_traffic/README.md for details
+```
+
+## Model Development Guidelines
+
+### Architecture Design
+
+**Before you code anything:**
+
+1. **Define the problem** - What are you detecting? What's the input/output?
+2. **Survey literature** - What architectures work for similar problems?
+3. **Start simple** - Baseline model first, then iterate
+4. **Justify complexity** - Every layer should have a reason to exist
+5. **Consider deployment** - Can this run in production? (latency, memory, GPU requirements)
+
+**Good Architecture:**
+```python
+# Clear, documented, justified
+class AnomalyDetector(BaseModel):
+    """
+    CNN-based network traffic anomaly detector.
+    
+    Architecture rationale:
+    - Conv layers: Extract local patterns from traffic features
+    - Global pooling: Aggregate patterns across time
+    - Dense layers: Final classification
+    
+    Performance: 96.3% accuracy, 8ms inference on CPU
+    """
+    def build_model(self):
+        # Simple, clean, commented
+        pass
+```
+
+**Bad Architecture:**
+```python
+# Random layers thrown together
+class MyModel:
+    def build(self):
+        # 47 layers for binary classification (why???)
+        # No documentation
+        # 2GB model size for 10KB input
+        # Overfits on 100 samples
+        pass
+```
+
+### Training Guidelines
+
+**Reproducibility is MANDATORY:**
+
+```python
+# Set seeds for reproducibility
+import numpy as np
+import tensorflow as tf
+import random
+
+SEED = 42
+np.random.seed(SEED)
+tf.random.set_seed(SEED)
+random.seed(SEED)
+```
+
+**Training best practices:**
+
+1. **Train/Val/Test Split** - 70/15/15 or 80/10/10, NO DATA LEAKAGE
+2. **Cross-Validation** - For small datasets, use k-fold CV
+3. **Early Stopping** - Don't overfit (patience=10 epochs is reasonable)
+4. **Learning Rate Scheduling** - Reduce on plateau or cosine annealing
+5. **Data Augmentation** - If applicable (be careful with security data)
+6. **Regularization** - Dropout, L2, etc. (justify your choices)
+7. **Batch Size** - Document your choice (and GPU memory constraints)
+
+**Log everything:**
+```python
+# TensorBoard, Weights & Biases, MLflow, whatever
+# We need to see:
+# - Loss curves (train + val)
+# - Metrics over time
+# - Hyperparameters
+# - System info (GPU, batch size, etc.)
+```
+
+### Performance Metrics
+
+**DON'T just report accuracy.** Security models need comprehensive metrics:
+
+**For Classification:**
+- Accuracy, Precision, Recall, F1-Score
+- Confusion Matrix
+- ROC-AUC, PR-AUC
+- False Positive Rate (critical for security!)
+- False Negative Rate (missed attacks are bad!)
+
+**For Anomaly Detection:**
+- Precision, Recall, F1
+- False Alarm Rate
+- Detection Rate
+- Time to Detection
+
+**For All Models:**
+- Inference time (ms per sample)
+- Model size (MB)
+- GPU memory usage
+- Throughput (samples/sec)
+
+**Example metrics report:**
+```python
+"""
+Performance Metrics:
+- Accuracy: 96.3%
+- Precision: 94.1% (attack detection)
+- Recall: 92.8% (don't miss attacks)
+- F1-Score: 93.4%
+- False Positive Rate: 2.1% (acceptable for production)
+- Inference Time: 8ms (CPU), 2ms (GPU)
+- Model Size: 0.7 MB (deployable)
+- Throughput: 5000 samples/sec (real-time capable)
+"""
+```
+
+### Dataset Requirements
+
+**Training data MUST be:**
+
+1. **Legally obtained** - No stolen datasets, no scraped private data
+2. **Properly licensed** - MIT, CC-BY, or compatible with our license
+3. **Ethically sourced** - No PII without consent, respect privacy
+4. **Documented** - See [DATASET_DOCUMENTATION.md](DATASET_DOCUMENTATION.md)
+5. **Reproducible** - Include generation scripts for synthetic data
+
+**Prohibited data sources:**
+- ❌ Stolen/leaked datasets
+- ❌ PII without consent
+- ❌ Copyrighted data without permission
+- ❌ Data from sanctioned countries (export control risk)
+- ❌ Classified or confidential data
+
+**Acceptable data sources:**
+- ✅ Synthetic data (generated, no privacy issues)
+- ✅ Public datasets with permissive licenses
+- ✅ Your own captured data (with proper authorization)
+- ✅ Anonymized/sanitized data (verified privacy-preserving)
+
+## Pull Request Process
+
+### Before Submitting
+
+Check this list or your PR will be rejected:
+
+- [ ] Code follows PEP 8 (run `black`, `flake8`, `mypy`)
+- [ ] All tests pass (`pytest tests/ -v`)
+- [ ] Model achieves reasonable performance (>baseline)
+- [ ] Training is reproducible (seeds set, documented)
+- [ ] Metrics reported honestly (all of them, not cherry-picked)
+- [ ] Model card created (see [MODEL_CARDS.md](MODEL_CARDS.md))
+- [ ] Dataset documented (see [DATASET_DOCUMENTATION.md](DATASET_DOCUMENTATION.md))
+- [ ] Export compliance verified (no prohibited data/destinations)
+- [ ] No merge conflicts with develop
+- [ ] You actually tested it on unseen data
+
+### PR Checklist
+
+Your PR better include:
+
+1. **Clear title** - "Added model" is not a title
+2. **Description**:
+   - What problem does this model solve?
+   - What architecture did you use? (and WHY?)
+   - What performance did you achieve?
+   - How did you train it? (hyperparameters, dataset, duration)
+   - What are the limitations?
+3. **Metrics** - Complete performance report (see above)
+4. **Plots** - Loss curves, confusion matrices, ROC curves
+5. **Model Card** - Filled out completely
+6. **Dataset Documentation** - If using new data
+7. **Ablation Studies** (optional but impressive) - What happens if you remove X layer?
+8. **Comparison to Baseline** - How much better is this than naive approach?
+9. **Deployment Considerations** - Inference time, model size, hardware requirements
+
+### Review Process
+
+1. **Automated Checks** - CI/CD must pass (linting, tests)
+2. **Performance Review** - Maintainer will verify metrics
+3. **Code Review** - Clean, documented, maintainable code
+4. **Ethics Review** - Data sourcing, bias, fairness
+5. **Security Review** - Model security, adversarial robustness
+6. **Export Compliance** - No prohibited data or destinations
+
+### Merge Requirements
+
+* All CI checks passing
+* At least one approving review from maintainer
+* Performance meets or exceeds baseline
+* No unresolved conversations
+* Model card and dataset docs complete
+* Export compliance verified
+
+## Coding Standards
+
+### Python Style
+
+Follow [PEP 8](https://pep8.org/) enforced by `black` and `flake8`:
+
+```bash
+# Format code
+black src/ tests/
+
+# Lint
 flake8 src/ tests/
 
 # Type checking
 mypy src/
 ```
 
-## 📝 Contribution Guidelines
+**Style requirements:**
+* **Line length**: 100 characters (black default)
+* **Docstrings**: Google-style docstrings for all public functions/classes
+* **Type hints**: Use type annotations (mypy should pass)
+* **Naming**:
+  * Classes: `PascalCase`
+  * Functions/methods: `snake_case`
+  * Constants: `UPPER_SNAKE_CASE`
+  * Private: `_leading_underscore`
 
-### Types of Contributions
-
-We welcome various types of contributions: 
-
-- 🐛 **Bug fixes**
-- ✨ **New features**
-- 📚 **Documentation improvements**
-- 🧪 **Tests and test coverage**
-- 🎨 **Code quality improvements**
-- 📦 **New model implementations**
-- 🔧 **Performance optimizations**
-
-### Contribution Workflow
-
-1. **Check existing issues** to avoid duplicate work
-2. **Create an issue** for new features or major changes
-3. **Fork and branch** from the main branch
-4. **Implement your changes** following our standards
-5. **Add tests** for new functionality
-6. **Update documentation** as needed
-7. **Submit a pull request** with clear description
-
-## 🔄 Pull Request Process
-
-### Before Submitting
-
-- [ ] Code follows our [coding standards](#coding-standards)
-- [ ] All tests pass locally
-- [ ] New tests added for new functionality
-- [ ] Documentation updated if needed
-- [ ] Pre-commit hooks pass
-- [ ] Branch is up to date with main
-
-### Pull Request Template
-
-```markdown
-## Description
-Brief description of changes made. 
-
-## Type of Change
-- [ ] Bug fix (non-breaking change which fixes an issue)
-- [ ] New feature (non-breaking change which adds functionality)
-- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
-- [ ] Documentation update
-
-## Testing
-- [ ] All existing tests pass
-- [ ] New tests added for new functionality
-- [ ] Manual testing performed
-
-## Checklist
-- [ ] Code follows style guidelines
-- [ ] Self-review completed
-- [ ] Documentation updated
-- [ ] No new warnings introduced
-```
-
-### Review Process
-
-1. **Automated checks** must pass (CI/CD pipeline)
-2. **Code review** by maintainers
-3. **Feedback incorporation** if needed
-4. **Final approval** and merge
-
-## 🐛 Issue Guidelines
-
-### Reporting Bugs
-
-Use the bug report template and include:
-
-- **Clear title** describing the issue
-- **Steps to reproduce** the problem
-- **Expected vs actual behavior**
-- **Environment details** (Python version, OS, etc.)
-- **Error messages** or logs
-- **Minimal code example** if applicable
-
-### Feature Requests
-
-Use the feature request template and include:
-
-- **Clear description** of the proposed feature
-- **Use case** and motivation
-- **Proposed implementation** (if you have ideas)
-- **Alternatives considered**
-
-### Issue Labels
-
-We use labels to organize issues:
-
-- `bug`: Something isn't working
-- `enhancement`: New feature or request
-- `documentation`: Documentation improvements
-- `good first issue`: Good for newcomers
-- `help wanted`: Community help needed
-- `security`: Security-related issues
-
-## 💻 Coding Standards
-
-### Code Style
-
-We follow **PEP 8** with some modifications:
+### Example
 
 ```python
-# Use black for formatting
-black src/ tests/
-
-# Line length:  88 characters (black default)
-# Import organization: isort compatible
-# Docstrings:  Google style
-```
-
-### Code Quality Tools
-
-- **Black**:  Automatic code formatting
-- **Flake8**: Linting and style checking
-- **MyPy**: Static type checking
-- **Pre-commit**:  Automated checks before commits
-
-### Best Practices
-
-#### General Guidelines
-- Write clear, readable code
-- Use descriptive variable and function names
-- Follow the principle of least surprise
-- Keep functions and classes focused and small
-
-#### ML-Specific Guidelines
-- Document model architectures clearly
-- Include proper input/output shape documentation
-- Add type hints for tensor operations
-- Use TensorFlow best practices
-
-#### Example Code Style
-
-```python
-from typing import Optional, Tuple
 import tensorflow as tf
-import numpy as np
+from typing import Tuple, Optional
 
-class ExampleModel:
-    """Example model following our coding standards. 
+class AnomalyDetector:
+    """Network traffic anomaly detector using CNN architecture.
     
-    Args:
-        input_shape: Shape of input tensors
-        num_classes: Number of output classes
-        name: Model name for identification
+    This model detects anomalous network behavior by analyzing
+    traffic patterns extracted from packet metadata.
+    
+    Attributes:
+        input_shape: Shape of input traffic features (timesteps, features)
+        num_classes: Number of anomaly classes (default: binary)
+        model: Compiled Keras model
+    
+    Example:
+        >>> detector = AnomalyDetector(input_shape=(100, 10))
+        >>> detector.build_model()
+        >>> detector.train(X_train, y_train, epochs=10)
+        >>> predictions = detector.predict(X_test)
     """
     
-    def __init__(
-        self,
-        input_shape:  Tuple[int, ... ],
-        num_classes: int,
-        name: str = "example_model"
-    ) -> None:
+    def __init__(self, input_shape: Tuple[int, int], num_classes: int = 2):
+        """Initialize anomaly detector.
+        
+        Args:
+            input_shape: Shape of input (timesteps, features)
+            num_classes: Number of output classes
+        """
         self.input_shape = input_shape
         self.num_classes = num_classes
-        self.name = name
-        self.model:  Optional[tf.keras. Model] = None
+        self.model: Optional[tf.keras.Model] = None
     
-    def build_model(self, **kwargs) -> tf.keras.Model:
-        """Build the model architecture. 
+    def build_model(self, filters: int = 32, dropout: float = 0.5) -> None:
+        """Build CNN architecture.
         
-        Returns:
-            Compiled TensorFlow model
+        Args:
+            filters: Number of convolutional filters in first layer
+            dropout: Dropout rate for regularization
+        
+        Raises:
+            ValueError: If input_shape is invalid
         """
-        # Implementation here
+        # Implementation with clear comments
         pass
 ```
 
-## 🧪 Testing Guidelines
+### Security Considerations
+
+AI/ML models have unique security concerns:
+
+* **Model Security**:
+  * Guard against adversarial examples
+  * Test model robustness to input perturbations
+  * Document known failure modes
+  * Consider model inversion attacks (can attacker extract training data?)
+
+* **Data Security**:
+  * Never log sensitive training data
+  * Sanitize data before saving checkpoints
+  * Encrypt model weights if they contain sensitive patterns
+  * Be aware of membership inference attacks
+
+* **Deployment Security**:
+  * Validate all inputs before inference
+  * Rate-limit API endpoints
+  * Monitor for model abuse
+  * Implement access controls
+
+## Testing Guidelines
 
 ### Test Structure
 
 ```
 tests/
-├── __init__.py
-├── test_models. py          # Model tests
-├── test_utils.py           # Utility tests
-└── fixtures/               # Test fixtures and data
+├── test_models.py        # Model architecture tests
+├── test_training.py      # Training pipeline tests
+├── test_data.py          # Data loading/preprocessing tests
+├── test_inference.py     # Inference and prediction tests
+└── test_utils.py         # Utility function tests
 ```
 
-### Testing Standards
+### Writing Tests
 
-- **Coverage**: Aim for >90% code coverage
-- **Test Types**:  Unit tests, integration tests
-- **Naming**: `test_<functionality>_<expected_outcome>`
-- **Documentation**: Clear docstrings for test functions
-
-### Example Test
+Use `pytest`:
 
 ```python
 import pytest
 import numpy as np
-from spectremap_models. models.cnn_model import SpectreMapCNN
+from spectremap_models.models import AnomalyDetector
 
-class TestSpectreMapCNN:
-    """Test suite for SpectreMapCNN model."""
+class TestAnomalyDetector:
+    """Test suite for AnomalyDetector model."""
     
-    def test_model_initialization_success(self):
-        """Test successful model initialization."""
-        model = SpectreMapCNN(
-            input_shape=(28, 28, 1),
-            num_classes=10,
-            name="test_cnn"
-        )
-        assert model. input_shape == (28, 28, 1)
-        assert model.num_classes == 10
-        assert model.name == "test_cnn"
+    @pytest.fixture
+    def model(self):
+        """Create model instance for testing."""
+        return AnomalyDetector(input_shape=(100, 10))
     
-    def test_model_build_creates_valid_architecture(self):
-        """Test that model building creates valid architecture."""
-        model = SpectreMapCNN(input_shape=(28, 28, 1), num_classes=10)
-        built_model = model. build_model()
+    def test_build_model(self, model):
+        """Test that model builds successfully."""
+        model.build_model()
+        assert model.model is not None
+        assert len(model.model.layers) > 0
+    
+    def test_training_reduces_loss(self, model):
+        """Test that training actually improves the model."""
+        X = np.random.randn(1000, 100, 10)
+        y = np.random.randint(0, 2, size=1000)
         
-        assert built_model is not None
-        assert len(built_model. layers) > 0
-        assert built_model.input_shape == (None, 28, 28, 1)
+        model.build_model()
+        history = model.train(X, y, epochs=5, verbose=0)
+        
+        # Loss should decrease
+        assert history.history['loss'][-1] < history.history['loss'][0]
+    
+    def test_inference_shape(self, model):
+        """Test that predictions have correct shape."""
+        X = np.random.randn(10, 100, 10)
+        model.build_model()
+        predictions = model.predict(X)
+        
+        assert predictions.shape == (10, 2)  # Binary classification
 ```
 
-### Running Tests
+### Test Coverage
 
+* **Minimum**: 80% code coverage
+* **Critical Paths**: 95%+ for model inference code
+* **New Models**: 85%+ coverage required
+
+Run coverage:
 ```bash
-# Run all tests
-python -m pytest tests/ -v
-
-# Run with coverage
-python -m pytest tests/ --cov=src/spectremap_models --cov-report=html
-
-# Run specific test file
-python -m pytest tests/test_models.py -v
-
-# Run tests matching pattern
-python -m pytest -k "test_cnn" -v
+pytest tests/ --cov=src/spectremap_models --cov-report=html
 ```
 
-## 📚 Documentation
+## Documentation
 
-### Documentation Types
+### Model Cards
 
-- **README**: Project overview and quick start
-- **API Documentation**: Function/class documentation
-- **Examples**: Working code examples
-- **Tutorials**: Step-by-step guides
+**Every model MUST have a Model Card.** See [MODEL_CARDS.md](MODEL_CARDS.md) for template.
 
-### Docstring Style
+Required sections:
+1. Model Details
+2. Intended Use
+3. Prohibited Uses
+4. Training Data
+5. Performance Metrics
+6. Limitations
+7. Ethical Considerations
+8. Export Controls
 
-We use **Google-style docstrings**:
+### Dataset Documentation
+
+**Every dataset MUST be documented.** See [DATASET_DOCUMENTATION.md](DATASET_DOCUMENTATION.md) for template.
+
+### Code Documentation
+
+Use Google-style docstrings:
 
 ```python
-def train_model(
-    x_train: np. ndarray,
-    y_train: np.ndarray,
-    epochs: int = 10,
-    batch_size: int = 32
-) -> tf.keras.callbacks.History:
-    """Train the model on provided data.
+def train_model(X_train, y_train, epochs=10, batch_size=32):
+    """Train the neural network model.
     
     Args:
-        x_train: Training input data of shape (samples, ...)
-        y_train: Training target data of shape (samples, ...)
-        epochs: Number of training epochs
-        batch_size: Batch size for training
-        
+        X_train (np.ndarray): Training features, shape (n_samples, ...)
+        y_train (np.ndarray): Training labels, shape (n_samples,)
+        epochs (int): Number of training epochs (default: 10)
+        batch_size (int): Batch size for training (default: 32)
+    
     Returns:
-        Training history object containing metrics
+        tf.keras.callbacks.History: Training history with loss/metrics
+    
+    Raises:
+        ValueError: If X_train and y_train have mismatched lengths
         
-    Raises: 
-        ValueError: If input shapes don't match model requirements
-        
-    Example: 
-        >>> model = SpectreMapCNN(input_shape=(28, 28, 1), num_classes=10)
-        >>> model.build_model()
-        >>> history = model.train(x_train, y_train, epochs=5)
+    Example:
+        >>> history = train_model(X_train, y_train, epochs=20)
+        >>> print(f"Final loss: {history.history['loss'][-1]}")
     """
+    pass
 ```
 
-### Documentation Building
+## Security & Ethics
 
-```bash
-# Install documentation dependencies
-pip install -e ".[docs]"
+### Security Review
 
-# Build documentation
-cd docs/
-make html
+Models touching security-sensitive data require:
 
-# View documentation
-open _build/html/index.html
-```
+1. **Adversarial Testing** - Test against adversarial examples
+2. **Robustness Analysis** - Evaluate on out-of-distribution data
+3. **Privacy Analysis** - Ensure no training data leakage
+4. **Bias Testing** - Check for demographic/geographic bias
+5. **Export Compliance** - Verify no prohibited data/destinations
 
-## 🚢 Release Process
+### Reporting Vulnerabilities
 
-### Version Management
+**DO NOT** create public issues for security vulnerabilities in models.
 
-We follow [Semantic Versioning](https://semver.org/):
+Email: **lackadaisicalresearch@pm.me**
 
-- **MAJOR.MINOR. PATCH**
-- **MAJOR**: Breaking changes
-- **MINOR**:  New features, backwards compatible
-- **PATCH**:  Bug fixes, backwards compatible
+Include:
+- Which model is vulnerable
+- Attack vector (adversarial example, model inversion, etc.)
+- Proof of concept
+- Suggested mitigation
 
-### Release Steps
+See [SECURITY.md](SECURITY.md) for responsible disclosure process.
 
-1. **Update version** in `setup.py` and `__init__.py`
-2. **Update changelog** with new features and fixes
-3. **Create release PR** with version bump
-4. **Merge to main** after approval
-5. **Tag release** and publish to PyPI
-6. **Update documentation** for new version
+### Ethical Checklist
 
-## 🏆 Recognition
+Before submitting:
 
-### Contributors
+- [ ] Training data obtained legally and ethically
+- [ ] No PII used without consent
+- [ ] Bias documented and mitigated where possible
+- [ ] Limitations clearly stated
+- [ ] Prohibited uses explicitly listed
+- [ ] Export controls verified
+- [ ] Privacy implications considered
 
-We recognize contributors in:
+## License
 
-- **README.md**: Contributors section
-- **CHANGELOG.md**: Release notes
-- **GitHub**:  Contributor graphs and statistics
+By contributing, you agree that your contributions will be licensed under the MIT License. See [LICENSE](LICENSE) for details.
 
-### Types of Recognition
-
-- **First-time contributors**: Special mention
-- **Regular contributors**: Maintainer status consideration
-- **Significant contributions**: Feature attribution
-
-## 📞 Getting Help
-
-### Communication Channels
-
-- **GitHub Issues**: Bug reports and feature requests
-- **GitHub Discussions**: Questions and general discussion
-- **Email**: [lackadaisicalresearch@pm.me](mailto:lackadaisicalresearch@pm.me)
-
-### Resources
-
-- **TensorFlow Documentation**: [tensorflow.org](https://tensorflow.org)
-- **Python Style Guide**: [PEP 8](https://pep8.org)
-- **Git Workflow**: [GitHub Flow](https://guides.github.com/introduction/flow/)
+You retain copyright to your contributions, but you grant us a perpetual license to use them.
 
 ---
 
-## 🙏 Thank You
+### 🔥 **Built by Lackadaisical Security** 🔥
 
-Thank you for contributing to **Spectre Map Models**! Your contributions help make cybersecurity AI more accessible and effective.
+*"Neural networks are not magic. They are mathematics, optimized through gradient descent, validated through rigorous testing, and deployed with full understanding of their capabilities and limitations. Show us the math. Show us the data. Show us the results. Everything else is noise."*
 
-**Happy Contributing!** 🎉
+**Copyright © 2025-2026 Lackadaisical Security. All rights reserved.**
